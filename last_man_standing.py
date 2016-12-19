@@ -81,7 +81,6 @@ def new_round(bot, update):
                         Bot.leave_chat(bot, chat_id=update.message.chat.id)
 
                     print(users)
-                    Bot.sendMessage(bot, chat_id=update.message.chat.id, text="Users have been kicked!")
                 except:
                     print("[!] ignoring error in new round")
 
