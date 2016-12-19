@@ -22,9 +22,6 @@ def start(bot, update):
 def help(bot, update):
     update.message.reply_text("Help:\n/add_me  to add yourself to the players list\n/new_round  to star the round\nGamerules:\n1. If your number is grater than 90 you will get kicked\n2. If the number 88 appears 2 times I will leave")
 
-def echo(bot, update):
-    pass
-
 def add_me(bot, update):
     global users
     print("added")
@@ -95,12 +92,30 @@ def new_round(bot, update):
 def uff(bot, update):
     pass # TODO: make something cool here
 
+    go = r.randint(0,100)
+
+    if (go > 80):
+        print("go " + str(go))
+        Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str("The uff has happened\nThe bot will roll a number between 0 and 100\nIf the number is greater than 75 you will get kicked!"))
+
+        for i in range(10, r.randint(20, 100)):
+            go = r.randint(0,100)
+
+        t.sleep(4)
+        Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str("The number is " + str(go)))
+
+        if (go > 75):
+            Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str("Enjoy your kick :P"))
+            t.sleep(2)
+            Bot.kick_chat_member(bot, chat_id=update.message.chat.id, user_id=update.message.from_user.id)
+        else:
+            Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str("You had luck this time"))
+
+    Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str("The uff has not happened"))
 
 def echo(bot, update):
     if (update.message.text.lower() == "uff"):
         uff(bot, update)
-
-
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
