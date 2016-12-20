@@ -20,7 +20,7 @@ def start(bot, update):
     update.message.reply_text("already started")
 
 def help(bot, update):
-    update.message.reply_text("Help:\n/add_me  to add yourself to the players list\n/new_round  to star the round\nGamerules:\n1. If your number is grater than 90 you will get kicked\n2. If the number 88 appears 2 times I will leave")
+    update.message.reply_text("Help:\n/add_me  to add yourself to the players list\n/new_round  to star the round\nGamerules:\n1. If your number is grater than 90 you will get kicked\n2. If the number 88 appears 2 times I will leave\n/battle for a 1 vs 1 battle")
 
 def add_me(bot, update):
     global users
@@ -32,10 +32,10 @@ def add_me(bot, update):
             alread_in = True
 
     if (alread_in):
-        print("Did not add user " + update.message.from_user.first_name + " alread added")
+        print("[!] did not add user " + update.message.from_user.first_name + " alread added")
     else:
         users.append((update.message.from_user.first_name, update.message.from_user.id))
-        print("Did add user " + update.message.from_user.first_name)
+        print("[!] did add user " + update.message.from_user.first_name)
         update.message.reply_text("added user " + update.message.from_user.first_name)
 
 def new_round(bot, update):
@@ -49,7 +49,7 @@ def new_round(bot, update):
             Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str("Lets start a new round!"))
 
             random_num = []
-            print("starting new round")
+            print("[!] starting new round")
             print(users)
 
             while len(users) > 1:
@@ -86,11 +86,65 @@ def new_round(bot, update):
             users = []
         except:
             running = False
-            print("Error in new round")
+            print("[!] error in new round (quit)")
+
+def battle(bot, update):
+    # a 1v1 battle!
+    global users
+
+    try:
+        if (len(users) == 2):
+            Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str(users[0][0] + " and " + users[1][0] + " are playing against each other!"))
+            t.sleep(2)
+            Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str("Whoever gets the higher number 3 times in a row wins!"))
+
+            won = False
+            player_1_wins = 0
+            player_2_wins = 0
+            need_wins = 3
+
+            while (not won):
+                t.sleep(3)
+
+                for i in range(0, r.randint(10, 200)):
+                    player_1 = r.randint(0, 100)
+                    player_2 = r.randint(0, 100)
+
+                Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str("The numbers are:\n" + users[0][0] + " -> " + str(player_1) + "\n" + users[1][0] + " -> " + str(player_2)))
+
+                if (player_1 == player_2):
+                    Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str("There was no winner this round\nNow you will have to get 4 numbers in a row!"))
+                    need_wins += 1
+                    player_1_wins = 0
+                    player_2_wins = 0
+
+                elif (player_1 > player_2):
+                    player_1_wins += 1
+                    player_2_wins = 0
+                    Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str(users[0][0] + " won this turn! " + str(need_wins - player_1_wins) + " wins to go\n"))
+                else:
+                    player_2_wins += 1
+                    player_1_wins = 0
+                    Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str(users[1][0] + " won this turn! " + str(need_wins - player_2_wins) + " wins to go\n"))
+
+                if (player_1_wins == need_wins):
+                    won = True
+                    Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str(users[0][0] + " wins the battle"))
+                elif (player_2_wins == need_wins):
+                    won = True
+                    Bot.sendMessage(bot, chat_id=update.message.chat.id, text=str(users[1][0] + " wins the battle"))
+                else:
+                    print("no winner yet")
+
+                print("one turn")
+    except:
+        print("[!] error exiting the battle")
+        users = []
+
+    users = []
 
 
 def uff(bot, update):
-    pass # TODO: make something cool here
 
     go = r.randint(0,100)
 
@@ -134,6 +188,7 @@ def main():
     dp.add_handler(CommandHandler("new_round", new_round))
     dp.add_handler(CommandHandler("add_me", add_me))
     dp.add_handler(CommandHandler("uff", uff))
+    dp.add_handler(CommandHandler("battle", battle))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
